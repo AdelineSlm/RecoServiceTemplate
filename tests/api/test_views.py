@@ -23,7 +23,8 @@ def test_get_reco_success(
     user_id = 123
     path = GET_RECO_PATH.format(model_name="RecModel", user_id=user_id)
     client.headers = CaseInsensitiveDict(
-        {"Authorization": f"Bearer {os.getenv('ACCESS_KEY')}"})
+        {"Authorization": f"Bearer {os.getenv('ACCESS_KEY')}"}
+    )
     with client:
         response = client.get(path)
     assert response.status_code == HTTPStatus.OK
@@ -39,7 +40,8 @@ def test_get_reco_for_unknown_user(
     user_id = 10**10
     path = GET_RECO_PATH.format(model_name="RecModel", user_id=user_id)
     client.headers = CaseInsensitiveDict(
-        {"Authorization": f"Bearer {os.getenv('ACCESS_KEY')}"})
+        {"Authorization": f"Bearer {os.getenv('ACCESS_KEY')}"}
+    )
     with client:
         response = client.get(path)
     assert response.status_code == HTTPStatus.NOT_FOUND
@@ -52,15 +54,16 @@ def test_get_reco_for_unknown_model(
     user_id = 1
     path = GET_RECO_PATH.format(model_name="some_model", user_id=user_id)
     client.headers = CaseInsensitiveDict(
-        {"Authorization": f"Bearer {os.getenv('API_KEY')}"})
+        {"Authorization": f"Bearer {os.getenv('ACCESS_KEY')}"}
+    )
     with client:
         response = client.get(path)
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json()["errors"][0]["error_key"] == "model_not_found"
 
 
-    def test_get_reco_unauthorized( 
-        client: TestClient,
+def test_get_reco_unauthorized(
+    client: TestClient,
 ) -> None:
     user_id = 1
     path = GET_RECO_PATH.format(model_name="some_model", user_id=user_id)
@@ -68,5 +71,3 @@ def test_get_reco_for_unknown_model(
         response = client.get(path)
     assert response.status_code == HTTPStatus.UNAUTHORIZED
     assert response.json()["errors"][0]["error_key"] == "not_authorized"
-
-    
