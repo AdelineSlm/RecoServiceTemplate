@@ -78,7 +78,7 @@ async def get_reco(
     if user_id > 10**9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
 
-    if model_name == "RecModel":
+    if model_name == "rec_model":
         k_recs = request.app.state.k_recs
     else:
         raise ModelNotFoundError(error_message=f"Model {user_id} not found")

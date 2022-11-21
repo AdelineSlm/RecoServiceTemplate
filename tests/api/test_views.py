@@ -21,7 +21,7 @@ def test_get_reco_success(
     service_config: ServiceConfig,
 ) -> None:
     user_id = 123
-    path = GET_RECO_PATH.format(model_name="RecModel", user_id=user_id)
+    path = GET_RECO_PATH.format(model_name="rec_model", user_id=user_id)
     client.headers = CaseInsensitiveDict(
         {"Authorization": f"Bearer {os.getenv('ACCESS_KEY')}"}
     )
@@ -38,7 +38,7 @@ def test_get_reco_for_unknown_user(
     client: TestClient,
 ) -> None:
     user_id = 10**10
-    path = GET_RECO_PATH.format(model_name="RecModel", user_id=user_id)
+    path = GET_RECO_PATH.format(model_name="rec_model", user_id=user_id)
     client.headers = CaseInsensitiveDict(
         {"Authorization": f"Bearer {os.getenv('ACCESS_KEY')}"}
     )
