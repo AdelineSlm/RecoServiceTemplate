@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, FastAPI, Request
 from pydantic import BaseModel
 
-from service.api.exceptions import UserNotFoundError, ModelNotFoundError
+from service.api.exceptions import ModelNotFoundError, UserNotFoundError
 from service.log import app_logger
 
 
@@ -27,7 +27,9 @@ async def health() -> str:
     path="/reco/{model_name}/{user_id}",
     tags=["Recommendations"],
     response_model=RecoResponse,
+    responses={404: {"description": "User or model not found"}}
 )
+
 async def get_reco(
     request: Request,
     model_name: str,
