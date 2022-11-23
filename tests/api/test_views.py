@@ -1,3 +1,4 @@
+import os
 from http import HTTPStatus
 
 from requests.structures import CaseInsensitiveDict
