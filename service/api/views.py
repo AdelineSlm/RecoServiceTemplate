@@ -31,8 +31,7 @@ token_bearer = HTTPBearer(auto_error=False)
 ACCESS_KEY = os.getenv("access_key")
 if ACCESS_KEY is None:
     raise Exception(
-        "ACCESS_KEY  is not set. "
-        "You can set it in .env file or in the environment variables."
+        "ACCESS_KEY is not set, you can set it in the .env file or in the environment."
     )
 
 
@@ -43,11 +42,12 @@ async def get_access_key(
 ) -> str:
     if access_key_from_header == ACCESS_KEY:
         return access_key_from_header
-    if access_key_from_query == ACCESS_KEY:
+    elif access_key_from_query == ACCESS_KEY:
         return access_key_from_query
-    if token is not None and token.credentials == ACCESS_KEY:
+    elif token is not None and token.credentials == ACCESS_KEY:
         return token.credentials
-    raise NotAuthorizedError()
+    else 
+        raise NotAuthorizedError()
 
 
 @router.get(
@@ -81,7 +81,7 @@ async def get_reco(
     if model_name == "rec_model":
         k_recs = request.app.state.k_recs
     else:
-        raise ModelNotFoundError(error_message=f"Model {user_id} not found")
+        raise ModelNotFoundError(error_message=f"Model {model_name} not found")
     reco = list(range(k_recs))
     return RecoResponse(user_id=user_id, items=reco)
 
