@@ -4,8 +4,8 @@ from os import getenv as env
 from service import log, settings
 
 # The socket to bind.
-host = env("HOST", "0.0.0.0")
-port = int(env("PORT", "8080"))
+host = env("HOST", "127.0.0.1")
+port = int(env("PORT", "8000"))
 bind = f"{host}:{port}"
 
 # The maximum number of pending connections.
