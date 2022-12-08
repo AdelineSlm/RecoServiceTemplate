@@ -1,9 +1,7 @@
 import os
 from typing import List
-import dill
-from ..postprocessing import get_genre_rank
-from userknn import UserKnn
 
+import dill
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI, Request, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -15,15 +13,17 @@ from service.api.exceptions import (
     UserNotFoundError,
 )
 from service.log import app_logger
+from userknn import UserKnn
 
+from ..postprocessing import get_genre_rank
 
 load_dotenv()
 
-with open('./service/pretrained_models/tfidf_15.dill', 'rb') as f:
+with open("./service/pretrained_models/tfidf_15.dill", "rb") as f:
     userknn = dill.load(f)
-with open('./service/data/items_dict.dill', 'rb') as f:
+with open("./service/data/items_dict.dill", "rb") as f:
     items_dict = dill.load(f)
-with open('./service/data/genres_dict.dill', 'rb') as f:
+with open("./service/data/genres_dict.dill", "rb") as f:
     genres_dict = dill.load(f)
 hot_users = genres_dict.keys()
 
