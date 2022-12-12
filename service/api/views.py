@@ -21,6 +21,8 @@ load_dotenv()
 
 with open("./service/pretrained_models/tfidf_15.dill", "rb") as f:
     userknn = dill.load(f)
+with open("./service/pretrained_models/top_popular.dill", "rb") as f:
+    popular = dill.load(f)
 with open("./service/data/items_dict.dill", "rb") as f:
     items_dict = dill.load(f)
 with open("./service/data/genres_dict.dill", "rb") as f:
@@ -93,7 +95,6 @@ async def get_reco(
         k_recs = request.app.state.k_recs
     else:
         raise ModelNotFoundError(error_message=f"Model {model_name} not found")
-    popular = [10440, 15297, 13865, 9728, 4151, 3734, 2657, 4880, 142, 6809]
 
     if user_id in hot_users:
         reco = userknn.predict(user_id)
