@@ -1,6 +1,7 @@
 import os
 from typing import List
 
+import dill
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI, Request, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -12,9 +13,21 @@ from service.api.exceptions import (
     UserNotFoundError,
 )
 from service.log import app_logger
+from userknn import UserKnn
 
+from ..postprocessing import get_genre_rank
 
 load_dotenv()
+
+with open("./service/pretrained_models/tfidf_15.dill", "rb") as f:
+    userknn = dill.load(f)
+with open("./service/pretrained_models/top_popular.dill", "rb") as f:
+    popular = dill.load(f)
+with open("./service/data/items_dict.dill", "rb") as f:
+    items_dict = dill.load(f)
+with open("./service/data/genres_dict.dill", "rb") as f:
+    genres_dict = dill.load(f)
+hot_users = genres_dict.keys()
 
 
 class RecoResponse(BaseModel):
@@ -46,7 +59,7 @@ async def get_access_key(
         return access_key_from_query
     elif token is not None and token.credentials == ACCESS_KEY:
         return token.credentials
-    else 
+    else:
         raise NotAuthorizedError()
 
 
@@ -78,11 +91,19 @@ async def get_reco(
     if user_id > 10**9:
         raise UserNotFoundError(error_message=f"User {user_id} not found")
 
-    if model_name == "rec_model":
+    if model_name == "userknn_model":
         k_recs = request.app.state.k_recs
     else:
         raise ModelNotFoundError(error_message=f"Model {model_name} not found")
-    reco = list(range(k_recs))
+
+    if user_id in hot_users:
+        reco = userknn.predict(user_id)
+        reco = get_genre_rank(reco, items_dict, genres_dict)
+        if len(reco) < k_recs:
+            reco.extend(popular)
+        reco = reco[:k_recs]
+    else:
+        reco = popular
     return RecoResponse(user_id=user_id, items=reco)
 
 
