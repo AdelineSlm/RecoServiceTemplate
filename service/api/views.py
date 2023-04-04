@@ -23,6 +23,8 @@ with open("./service/pretrained_models/tfidf_15.dill", "rb") as f:
     userknn = dill.load(f)
 with open("./service/pretrained_models/top_popular.dill", "rb") as f:
     popular = dill.load(f)
+with open("./service/pretrained_models/lightfm.dill", "rb") as f:
+    fm_model = dill.load(f)
 with open("./service/data/items_dict.dill", "rb") as f:
     items_dict = dill.load(f)
 with open("./service/data/genres_dict.dill", "rb") as f:
@@ -93,17 +95,26 @@ async def get_reco(
 
     if model_name == "userknn_model":
         k_recs = request.app.state.k_recs
+        if user_id in hot_users:
+            reco = userknn.predict(user_id)
+            reco = get_genre_rank(reco, items_dict, genres_dict)
+            if len(reco) < k_recs:
+                reco.extend(popular)
+            reco = reco[:k_recs]
+        else:
+            reco = popular
+
+    elif model_name == "fm_model":
+        k_recs = request.app.state.k_recs
+        reco = fm_model.setdefault(user_id, None)
+        if reco:
+            reco = reco[:k_recs]
+        else:
+            reco = popular
+
     else:
         raise ModelNotFoundError(error_message=f"Model {model_name} not found")
 
-    if user_id in hot_users:
-        reco = userknn.predict(user_id)
-        reco = get_genre_rank(reco, items_dict, genres_dict)
-        if len(reco) < k_recs:
-            reco.extend(popular)
-        reco = reco[:k_recs]
-    else:
-        reco = popular
     return RecoResponse(user_id=user_id, items=reco)
 
 
